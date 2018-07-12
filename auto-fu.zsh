@@ -801,6 +801,7 @@ afu-hmbk-selected-key-p () {
   }
   [[ $KEYS[-1] == $'\015' ]] && return 0
   [[ $KEYS[-1] == $'\012' ]] && return 0
+
   [[ $KEYS[-1] == $'/' ]]    && return 0 # for example 'scp host:/'
   return 1
 }
@@ -977,9 +978,14 @@ afu+complete-word () {
         zle complete-word
       }
 
-      zle complete-word
-      [[ $_lastcomp =~ "automenu-unambiguous" ]] \
-        && [[ $LBUFFER[-1] != [[:space:]] ]] && zle complete-word
+      if [[ $LBUFFER[-1] != '/' ]]
+      then
+        zle complete-word
+        [[ $_lastcomp =~ "automenu-unambiguous" ]] \
+          && [[ $LBUFFER[-1] != [[:space:]] ]] \
+          && zle complete-word
+      fi
+
       return $?
     }
 
