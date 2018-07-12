@@ -984,6 +984,9 @@ afu+complete-word () {
         [[ $_lastcomp =~ "automenu-unambiguous" ]] \
           && [[ $LBUFFER[-1] != [[:space:]] ]] \
           && zle complete-word
+      else
+        LBUFFER="$LBUFFER[1,-2]"
+        zle complete-word
       fi
 
       return $?
