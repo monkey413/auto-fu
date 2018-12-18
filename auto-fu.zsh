@@ -8,7 +8,10 @@ afu_zles=( \
 afu-install () {
   zstyle -t ':auto-fu:var' misc-installed-p || {
     zmodload zsh/parameter 2>/dev/null || {
-      echo 'auto-fu:zmodload error. exiting.' >&2; exit -1
+      echo 'Auto-fu:zmodload error. Exiting...' >&2; exit -1
+    }
+    zmodload zsh/terminfo 2>/dev/null || {
+      echo 'Auto-fu:zmodload error. Exiting...' >&2; exit -1
     }
     afu-install-isearchmap
     afu-install-eof
@@ -19,8 +22,9 @@ afu-install () {
 
   bindkey -N afu main
   { "$@" }
+
+  bindkey -M afu "$terminfo[kcbt]" afu+complete-word
   bindkey -M afu "^I" afu+complete-word
-  bindkey -M afu "\e[Z" afu+complete-word
   bindkey -M afu "^M" afu+accept-line
 
   bindkey -N afu-vicmd vicmd
@@ -604,7 +608,8 @@ afu-autoable-large-dir-p () {
 
   local words=( ${(s: :)LBUFFER} );
 
-  ! [[ -d "${words[-1]}" ]] && return 0
+  ! [[ ${words[-1][-1]} != '/' ]] \
+    && words[-1]=${words[-1]:h}
 
   (( $(zsh-count-files "${words[-1]}") > 200 )) && return 1 || return 0
 }
@@ -1457,27 +1462,36 @@ auto-fu-zcompile () {
       cat << EOF | gcc -O2 -o $HOME/.local/bin/zsh-count-files -xc -
         #include <dirent.h>
         #include <stdio.h>
+        #include <time.h>
+
+        #define DL 201
+        #define TL CLOCKS_PER_SEC / 50
 
         int count(char *path) {
           struct dirent *ent;
 
           DIR* dir = opendir(path);
 
+          clock_t begin = clock();
+
           if (dir == NULL)
             return 0;
 
           int counts = 0;
-          while ((ent = readdir(dir)) && counts < 201)
-            counts++;
+          while ((ent = readdir(dir)) && counts < DL)
+            if (clock() - begin < TL)
+              counts++;
+            else
+              { counts = DL; break; }
 
           closedir(dir);
           return counts;
         }
 
         int main(int argc, char *argv[])
-        { if (argc > 1)
-            printf("%d", count(argv[1]));
-          return 0; }
+          { if (argc > 1)
+              printf("%d", count(argv[1]));
+            return 0; }
 EOF
 
   local s=${1:?Please specify the source file itself.}
