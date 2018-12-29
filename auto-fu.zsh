@@ -664,7 +664,7 @@ afu-autoable-specials-p () {
   [[ $LBUFFER -regex-match "^.*'$" ]] && return 1
 
   # specials
-  [[ $LBUFFER[-1] -regex-match "[<> [\(\)&\|\"']" ]] && return 1
+  [[ $LBUFFER[-1] -regex-match "[<> [\(\)&\|;\"']" ]] && return 1
   [[ $LBUFFER[-1] -regex-match "\]" ]] && return 1
 
   # completion bug in zsh distribution
