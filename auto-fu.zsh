@@ -23,7 +23,6 @@ afu-install () {
   bindkey -N afu main
   { "$@" }
 
-  bindkey -M afu "$terminfo[kcbt]" afu+complete-word
   bindkey -M afu "^I" afu+complete-word
   bindkey -M afu "^M" afu+accept-line
 
