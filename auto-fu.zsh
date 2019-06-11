@@ -1286,9 +1286,9 @@ afu-install~ () {
     [[ -z ${AUTO_FU_NOCP-} ]] || return
     # For backward compatibility
     zstyle ':auto-fu:highlight' input bold
-    zstyle ':auto-fu:highlight' completion fg=black,bold
-    zstyle ':auto-fu:highlight' completion/one fg=black,bold
-    zstyle ':auto-fu:var' postdisplay $'\n'
+    zstyle ':auto-fu:highlight' completion fg=green,bold
+    zstyle ':auto-fu:highlight' completion/one fg=green,bold
+    zstyle ':auto-fu:var' postdisplay $''
   }
 }
 
